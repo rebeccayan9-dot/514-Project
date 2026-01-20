@@ -107,3 +107,19 @@ User Interface (Output): WS2812B RGB LED Ring (e.g., 8-bit or 12-bit ring)
 
 Function: Integrated into the button to glow Green (good), Yellow (warning), or flash Red (alert).
 
+### Figure 2: Operational Logic (Sensor & Data Flow)
+
+#### Data Acquisition
+The MPU-6050 sensor constantly reads X, Y, Z acceleration data.
+
+#### Processing
+The first XIAO ESP32C3 runs a "Stationary Detection Algorithm." If the variation in accelerometer data is below a specific threshold for >5 seconds, it flags the user as "Sedentary."
+
+#### Wireless Transmission
+The status (e.g., STATUS: SEDENTARY) is sent via BLE (Bluetooth Low Energy) to the desk unit.
+
+#### Action
+The desk unit's XIAO ESP32C3 processes this message. If "Sedentary" is true, it pulses the ULN2003 driver to move the 28BYJ-48 motor one step forward.
+
+#### Reset
+When the user touches the TTP223 sensor, the desk unit moves the motor back to the start position (Zero).
