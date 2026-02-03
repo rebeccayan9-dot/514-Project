@@ -1,128 +1,84 @@
 # FocusFlow: AI Desktop Wellness Monitor
-## Overview
 
-FocusFlow (formerly Rest Radar) is a privacy-first, AI-powered workspace companion designed to help you balance focus and rest. Unlike intrusive software notifications, it uses a physical desktop gauge to visualize your sedentary time and encourages healthy breaks through calm, ambient feedback.
-## The system consists of two wireless desktop nodes:
-
-The Vision Node (Sensor): A smart camera that sits on your desk. It uses Edge AI to detect if you are present and recognizes hand gestures for touch-free control.
-
-The Gauge Node (Display): A mechanical dial that fills up as you work (0-60 mins). It provides a physical representation of your "focus stamina" and alerts you when it's time to stretch.
-
-Privacy Note: All video processing is done locally on the device (Edge Computing). No video or images are ever stored or transmitted.
-
-<img width="667" height="544" alt="e2fff865effaae6e8601e1a5b340a896" src="https://github.com/user-attachments/assets/d24ab8f0-d394-4b7a-93ef-a991d71031ff" />
-
-## Why am I doing this?
-According to University Health Services at Princeton, "In order to prevent RSI, adjust your desk and computer area to promote good posture. Remember that the human body is not made to sit still for long periods of time, so get up and move around as much as you can. This may involve taking 30-60 second breaks every ten minutes or so, and **getting up to walk around and stretch your muscles every hour**".
-
-## Key Features
-The sensing unit is a compact, unobtrusive "badge" designed to be magnetically clipped to your shirt collar or pocket. Its primary function is Sedentary State Detection. It houses a small rechargeable battery and features a status LED to indicate battery life and connection status.
-Using an onboard MPU-6050 IMU (accelerometer), the device continuously tracks:
-
-1. Orientation: Determines if the user is upright (sitting/standing) versus reclining or off-body.
-
-2. Activity Level: Monitors micro-movements to determine if the user is stationary (working) or active (walking/moving).
+**FocusFlow** (formerly Rest Radar) is a privacy-first, AI-powered workspace companion designed to help you balance focus and rest. Unlike intrusive software notifications, it uses a physical desktop gauge to visualize your sedentary time and encourages healthy breaks through calm, ambient feedback.
 
 
-![6bc67e3b8cabc195183e0a3682292223](https://github.com/user-attachments/assets/c7c04268-74c5-48e3-9a79-62d765753f30)
+## 📖 Overview
 
-### Logic
-- When the device detects the user is "Stationary & Upright" for a continuous period of 60 minutes, it triggers a "Stretch Alert." This status is transmitted wirelessly via Bluetooth to the Display Unit to notify the user.
+The system consists of two wireless desktop nodes:
+1.  **The Vision Node (Sensor):** A smart camera that sits on your desk. It uses Edge AI to detect if you are present and recognizes hand gestures for touch-free control.
+2.  **The Gauge Node (Display):** A mechanical dial that fills up as you work (0-60 mins). It provides a physical representation of your "focus stamina" and alerts you when it's time to stretch.
 
-### Bill of Materials (Sensor):
+> **Privacy Note:** All video processing is done locally on the device (Edge Computing). No video or images are ever stored or transmitted.
 
-- Microcontroller: Seeed Studio XIAO ESP32C3 (Supports BLE & Battery Charge)
+## ✨ Key Features
 
-- Sensor: InvenSense MPU-6050 (6-axis Accelerometer/Gyro)
+* **👀 Presence Detection:** Automatically starts the timer when you sit down and pauses when you leave.
+* **👋 Gesture Control:** Control the timer without breaking your flow:
+    * **✋ Palm:** Pause/Resume Timer (e.g., for phone calls).
+    * **👌 OK Sign:** Reset Session (finish a break).
+* **🕰 Analog Visualization:** A stepper motor gauge provides a distraction-free, quick-glance status of your session.
+* **💡 Ambient Feedback:** An RGB LED ring indicates daily focus achievements and connection status.
 
-- Power: 3.7V 400mAh LiPo Battery
+## 🛠 Hardware Architecture
 
-- User Interface: 3mm LED (Red/Green) for status indication
+The project uses a split **Sensor-Display** architecture communicating via **BLE (Bluetooth Low Energy)**.
 
-- Mounting: N52 Neodymium Magnetic Backplate
-- Enclosure: Custom 3D-printed housing (PLA/PETG)
+### 1. Vision Sensor Node (Transmitter)
+* **Core:** Seeed Studio XIAO ESP32C3
+* **AI Module:** Grove Vision AI Module V2
+* **Camera:** OV5647 (Connected via CSI ribbon)
+* **Power:** USB-C (Continuous power)
 
+### 2. Gauge Display Node (Receiver)
+* **Core:** Seeed Studio XIAO ESP32C3
+* **Actuator:** 28BYJ-48 Stepper Motor + ULN2003 Driver
+* **Input:** Capacitive Touch Button / Physical Button (SW1) for manual backup
+* **Feedback:** WS2812B RGB LED
+* **Power:** 3.7V LiPo Battery (Portable)
 
-## Display
-The display unit is a minimalist, custom-designed desktop gauge that visualizes your Cumulative Sedentary Time. It acts as a peripheral "fuel gauge" for your energy levels, receiving wireless status updates from the wearable badge. To ensure a wireless and clean desktop setup, the unit is powered by an internal rechargeable battery and features a USB Type-C port for charging.
+## 📸 Wiring & Schematics
 
-### Visual Logic
-- The gauge face represents a 60-minute timeline. As you sit, the stepper motor slowly advances the needle from the "Fresh" zone (Green/Left) toward the "Fatigue" zone (Red/Right).
-### Alert
-- When the needle hits the 60-minute mark, the integrated RGB LED ring pulses red, visually signaling that it is time to stand up and stretch.
-### Interaction
-- A capacitive touch button below the dial allows you to manually pause the timer (for meetings) or reset it if you take a break at your desk.
+### Vision Sensor Pinout
+| XIAO Pin | Connected To | Function |
+| :--- | :--- | :--- |
+| **D4** | Vision AI (D4) | I2C SDA |
+| **D5** | Vision AI (D5) | I2C SCL |
+| **3V3** | Vision AI (3V3) | Power |
+| **GND** | Vision AI (GND) | Ground |
 
-![f7ea4114e332eb58a0610be65a6286a8](https://github.com/user-attachments/assets/fbd595fc-ea00-41fb-a785-b40e76e10854)
+### Display Gauge Pinout
+| XIAO Pin | Connected To | Function |
+| :--- | :--- | :--- |
+| **D0 - D3** | ULN2003 (IN1-IN4)| Stepper Motor Control |
+| **D6** | RGB LED (DIN) | Status Light |
+| **D7** | Button (SW1) | Manual Input |
+| **BAT+/-** | LiPo Battery | Power |
 
-### Bill of Materials (Display):
+> **Schematic Reference:**
+> Please check the `/images` folder for detailed wiring diagrams:
+> * `sensor_schematic.png` (Vision Node)
+> * `display_schematic.png` (Gauge Node)
 
-- Microcontroller: Seeed Studio XIAO ESP32C3 (Surface mounted on Custom PCB)
+## 🧠 System Logic
 
-- Actuator: 28BYJ-48 5V Stepper Motor
+1.  **Idle:** System waits for user presence.
+2.  **Active:** Camera detects user -> Timer starts incrementing.
+    * *Gauge moves 0% -> 100% (Green to Red zone).*
+3.  **Interaction:**
+    * User shows ✋ -> Timer Pauses (LED blinks Blue).
+    * User shows 👌 -> Timer Resets to 0 (LED blinks Green).
+4.  **Alert:** Timer hits 60 mins -> LED pulses Red -> Motor vibrates needle to signal break time.
+5.  **Away:** User leaves desk > 5 mins -> Auto-Reset.
 
-- Motor Driver: ULN2003 Driver IC (Integrated on PCB)
+## 📦 Bill of Materials
 
-- User Interface: Capacitive Touch Button with integrated WS2812B RGB LED Ring
+* 2x Seeed Studio XIAO ESP32C3
+* 1x Grove Vision AI Module V2
+* 1x OV5647 Camera Module
+* 1x 28BYJ-48 Stepper Motor & ULN2003 Driver Board
+* 1x WS2812B RGB LED
+* 1x 3.7V LiPo Battery
+* 3D Printed Enclosures (STL files in `/3d_models`)
 
-- Power: 3.7V 1000mAh LiPo Battery (USB-C Rechargeable)
-
-- Enclosure: Custom 3D-printed housing (PLA/PETG)
-
-## Diagrams
-
-<img width="1024" height="559" alt="image" src="https://github.com/user-attachments/assets/6c21b9b6-9a5f-41c6-a959-890110ea0382" />
-
-### Figure 1: Device Communication Architecture (Hardware Breakdown)
-
-1. Wearable Sensor Unit (The Sender) This unit attaches to the user's body (or chair) to detect movement and posture.
-
-#### Motion Sensor (IMU): MPU-6050
-A 6-axis Accelerometer and Gyroscope. It detects if you are sitting upright, leaning forward (posture), or moving around (activity level).
-
-#### Microcontroller: Seeed Studio XIAO ESP32C3
-
-Reads data from the MPU-6050 and transmits status updates wirelessly via Bluetooth (BLE).
-
-#### Power: 3.7V LiPo Battery (400mAh)
-
-Small, rechargeable battery to keep the wearable lightweight.
-
-2. Desk Display Unit (The Receiver) This unit sits on the desk, receives the signal, and provides visual feedback.
-
-#### Microcontroller: Seeed Studio XIAO ESP32C3
-
-Function: Receives the Bluetooth signal and controls the motor and LEDs.
-
-#### Actuator (Motor): 28BYJ-48 (5V Stepper Motor)
-
-Function: Physically rotates the gauge needle.
-
-#### Motor Driver: ULN2003 Driver Board
-
-Function: Interface board required to power and control the stepper motor.
-
-#### User Interface (Input): TTP223 Capacitive Touch Sensor
-
-Function: Detects when the user taps the button to reset the timer.
-
-User Interface (Output): WS2812B RGB LED Ring (e.g., 8-bit or 12-bit ring)
-
-Function: Integrated into the button to glow Green (good), Yellow (warning), or flash Red (alert).
-
-### Figure 2: Operational Logic (Sensor & Data Flow)
-
-#### Data Acquisition
-The MPU-6050 sensor constantly reads X, Y, Z acceleration data.
-
-#### Processing
-The first XIAO ESP32C3 runs a "Stationary Detection Algorithm." If the variation in accelerometer data is below a specific threshold for >5 seconds, it flags the user as "Sedentary."
-
-#### Wireless Transmission
-The status (e.g., STATUS: SEDENTARY) is sent via BLE (Bluetooth Low Energy) to the desk unit.
-
-#### Action
-The desk unit's XIAO ESP32C3 processes this message. If "Sedentary" is true, it pulses the ULN2003 driver to move the 28BYJ-48 motor one step forward.
-
-#### Reset
-When the user touches the TTP223 sensor, the desk unit moves the motor back to the start position (Zero).
+## 📂 Project Structure
