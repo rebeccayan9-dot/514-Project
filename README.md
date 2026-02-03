@@ -1,18 +1,21 @@
-# Rest Radar
+# FocusFlow: AI Desktop Wellness Monitor
 ## Overview
 
-Rest Radar is a physical workspace wellness system designed to prevent sedentary fatigue. Instead of annoying notifications on your screen, it uses a peripheral "fuel gauge" on your desk to visualize how long you have been sitting or working continuously in front of your screen.
+FocusFlow (formerly Rest Radar) is a privacy-first, AI-powered workspace companion designed to help you balance focus and rest. Unlike intrusive software notifications, it uses a physical desktop gauge to visualize your sedentary time and encourages healthy breaks through calm, ambient feedback.
+## The system consists of two wireless desktop nodes:
 
-- The Wearable Sensor detects when you are seated at your computer.
+The Vision Node (Sensor): A smart camera that sits on your desk. It uses Edge AI to detect if you are present and recognizes hand gestures for touch-free control.
 
-- The Desk Gauge fills up slowly like a timer. When it hits the "Red Zone" (e.g., 50 minutes), it alerts you to take a break.
+The Gauge Node (Display): A mechanical dial that fills up as you work (0-60 mins). It provides a physical representation of your "focus stamina" and alerts you when it's time to stretch.
+
+Privacy Note: All video processing is done locally on the device (Edge Computing). No video or images are ever stored or transmitted.
 
 <img width="667" height="544" alt="e2fff865effaae6e8601e1a5b340a896" src="https://github.com/user-attachments/assets/d24ab8f0-d394-4b7a-93ef-a991d71031ff" />
 
 ## Why am I doing this?
 According to University Health Services at Princeton, "In order to prevent RSI, adjust your desk and computer area to promote good posture. Remember that the human body is not made to sit still for long periods of time, so get up and move around as much as you can. This may involve taking 30-60 second breaks every ten minutes or so, and **getting up to walk around and stretch your muscles every hour**".
 
-## Sensor
+## Key Features
 The sensing unit is a compact, unobtrusive "badge" designed to be magnetically clipped to your shirt collar or pocket. Its primary function is Sedentary State Detection. It houses a small rechargeable battery and features a status LED to indicate battery life and connection status.
 Using an onboard MPU-6050 IMU (accelerometer), the device continuously tracks:
 
